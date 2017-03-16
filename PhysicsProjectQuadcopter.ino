@@ -3,6 +3,8 @@ int motor2 = 10;
 /*int motor3 = 9;      //Motors 3 and 4 are commented evrywhere as 
 int motor4 = 6;        // I m assuming that we will connect two motors two one pin*/   
 int buzz = 13;
+int flag = 0;
+int motorLevel = 10;      // assuming tht quadcopter doesn't fly in this value
 
 String comm;
 
@@ -10,9 +12,9 @@ void checkComm( String a);      //switch case
 int checkCode(String a);        // as switch accepts only int
 void sound();                   // beep function
 void on();
-void off(int &n);               //call by reference so that the value of pwm changes with evry function
-void up(int &n);
-void down(int &n);
+void off(int n);               //call by reference so that the value of pwm changes with evry function
+void up(int n);
+void down(int n);
 
 void setup() {
   // put your setup code here, to run once:
@@ -35,6 +37,7 @@ void loop() {
   // put your main code here, to run repeatedly:
   if(Serial.available()>0){
       comm = Serial.readString();   // this will read string the string from the user
+      Serial.println(comm);
     }
   checkComm(comm);      //calling the check command function  
 
@@ -52,13 +55,15 @@ int checkCode(String a){
 
 void checkComm(String a){
 
-    int motorLevel = 10;   //assuming that out of 255 quadcopter will not fly at it
+  
     
     switch(checkCode(a)){
 
         case 1:    on();  // on function is called
+                   Serial.println("Device is ON!") ;
                         break;
         case 2:   off(motorLevel);
+                  Serial.println("Device is OFF!") ;
                         break;
         case 3:    up(motorLevel);
                         break;
@@ -80,7 +85,7 @@ void sound(){
     digitalWrite(buzz,LOW);
   }
 
-void off(int &n){
+void off(int n){
   while(n>10){
       analogWrite(motor1,n);
       analogWrite(motor2,n);
@@ -89,6 +94,7 @@ void off(int &n){
    digitalWrite(motor1,LOW);
    digitalWrite(motor2,LOW);
    sound();
+   flag = 0;
    n=10;
   }
 
@@ -99,11 +105,12 @@ void on(){
   digitalWrite(motor2,HIGH);
   analogWrite(motor1,10);
   analogWrite(motor2,10);
+  flag = 1;
   }
 
-void up(int &n){
+void up(int n){
   
-  if(n+33 < 208){        // assuming 208 as the highest pole point
+  if(n+33 < 208 && flag == 1 ){        // assuming 208 as the highest pole point
     n+=33;
     analogWrite(motor1,n);
     analogWrite(motor2,n);
@@ -111,9 +118,9 @@ void up(int &n){
   else  sound();             //give a beep
 } 
 
-void down(int &n){
+void down(int n){
   
-  if(n-33 > 10){
+  if(n-33 > 10 && flag == 1){
     n-=33;
     analogWrite(motor1,n);
     analogWrite(motor2,n);
