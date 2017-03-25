@@ -4,17 +4,10 @@ int motor2 = 10;
 int motor4 = 6;        // I m assuming that we will connect two motors two one pin*/   
 int buzz = 13;
 int flag = 0;
-int motorLevel = 10;      // assuming tht quadcopter doesn't fly in this value
+int n = 10;      // assuming tht quadcopter doesn't fly in this value
 
-String comm;
-
-void checkComm( String a);      //switch case
-int checkCode(String a);        // as switch accepts only int
-void sound();                   // beep function
-void on();
-void off(int n);               //call by reference so that the value of pwm changes with evry function
-void up(int n);
-void down(int n);
+int c = 0;
+String comm,readString;
 
 void setup() {
   // put your setup code here, to run once:
@@ -35,11 +28,29 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-  if(Serial.available()>0){
+ /* if(Serial.available()>0){
       comm = Serial.readString();   // this will read string the string from the user
       Serial.println(comm);
     }
-  checkComm(comm);      //calling the check command function  
+  checkComm(comm);      //calling the check command function  */
+  /*while (Serial.available()) {
+    delay(10);  //small delay to allow input buffer to fill
+
+    char c = Serial.read();  //gets one byte from serial buffer
+    Serial.write(c);
+    readString += c; 
+  } //makes the string readString  
+
+  if (readString.length() >0) {
+    Serial.println(readString); //prints string to serial port out
+
+    readString=""; //clears variable for new input*/
+    if(Serial.available()>0){
+      c = Serial.read();
+      checkComm(c);
+      c=0;
+    }
+    
 
 }
 
@@ -53,23 +64,23 @@ int checkCode(String a){
                       else return 0;
   }
 
-void checkComm(String a){
+void checkComm(int a){
 
   
     
-    switch(checkCode(a)){
+    switch(a){
 
         case 1:    on();  // on function is called
-                   Serial.println("Device is ON!") ;
+                  // Serial.println("Device is ON!") ;
                         break;
-        case 2:   off(motorLevel);
-                  Serial.println("Device is OFF!") ;
+        case 2:   off();
+                 // Serial.println("Device is OFF!") ;
                         break;
-        case 3:    up(motorLevel);
+        case 3:    up();
                         break;
-        case 4:  down(motorLevel);
+        case 4:  down();
                         break;
-        default :       Serial.println("Command doesn't exist or use all commands in CAPS!");
+       default :       Serial.println("Error!");
                         break;
                        
       }
@@ -85,12 +96,12 @@ void sound(){
     digitalWrite(buzz,LOW);
   }
 
-void off(int n){
-  while(n>10){
+void off(){
+  /*while(n>10){
       analogWrite(motor1,n);
       analogWrite(motor2,n);
       n-=15;
-    }
+    }*/
    digitalWrite(motor1,LOW);
    digitalWrite(motor2,LOW);
    sound();
@@ -108,9 +119,9 @@ void on(){
   flag = 1;
   }
 
-void up(int n){
+void up(){
   
-  if(n+33 < 208 && flag == 1 ){        // assuming 208 as the highest pole point
+  if(n+33 < 208){        // assuming 208 as the highest pole point
     n+=33;
     analogWrite(motor1,n);
     analogWrite(motor2,n);
@@ -118,9 +129,9 @@ void up(int n){
   else  sound();             //give a beep
 } 
 
-void down(int n){
+void down(){
   
-  if(n-33 > 10 && flag == 1){
+  if(n-33 > 10){
     n-=33;
     analogWrite(motor1,n);
     analogWrite(motor2,n);
