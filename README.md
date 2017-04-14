@@ -1,5 +1,5 @@
-# physicsDrone
-This the arduino code for physics Drone project
+# Quadcopter
+This the arduino code for bluetooth controlled quadcopter project
 
 This is the code for controlling a quadcopter using an arduino command prompt application in phone connected to arduino via bluetooth using bluetooth module.
  * Presently using this we code can switch on,off,increase and decrease the speed of all motors together.
